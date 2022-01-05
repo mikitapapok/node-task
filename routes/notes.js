@@ -7,7 +7,7 @@ router.get('/notes', (req, res) => {
 });
 
 router.post('/notes', (req, res) => {
-    res.send(req.body.json());
+    res.json({});
 });
 
 module.exports = router;
