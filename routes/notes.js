@@ -13,7 +13,8 @@ const fetchedData = Joi.object({
     updateDate: Joi.date().allow(null),
 });
 
-const notes = [];
+let notes = [];
+let currentNote;
 const isDataValid = (req, res, next) => {
     try {
         const { error } = fetchedData.validate(req.body);
@@ -27,7 +28,7 @@ const isDataValid = (req, res, next) => {
 };
 const findElement = (req, res, next) => {
     try {
-        const currentNote = notes.find((note) => note.id === req.params.id);
+        currentNote = notes.find((note) => note.id === req.params.id);
         if (!currentNote) {
             throw new Error('sended data not found');
         }
@@ -38,14 +39,7 @@ const findElement = (req, res, next) => {
 };
 
 const putElement = (req, res, next) => {
-    const currentNote = notes.findIndex((note) => note.id === req.params.id);
-    // currentNote = req.body;
-    for (prop in req.body) {
-        currentNote[prop] = req.body[prop];
-    }
-    if (currentNote.length > req.body.length) {
-        delete currentNote.updateDate;
-    }
+    notes = [req.body];
     next();
 };
 
