@@ -30,7 +30,7 @@ router.post('/notes', [jsonParser, isDateValid], (req, res) => {
     res.json(req.body);
 });
 
-router.put('/notes/:id', [jsonParser, findElement, putElement], (req, res) => {
+router.put('/notes/:id', [jsonParser, findElement, isDateValid, putElement], (req, res) => {
     res.json(req.body);
 });
 
