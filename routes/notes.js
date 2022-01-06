@@ -11,7 +11,7 @@ let currentNote;
 const findElement = (req, res, next) => {
     currentNote = notes.find((note) => note.id === req.params.id);
     if (!currentNote) {
-        res.status(404).json({ error: { message: error.message } });
+        return res.status(404).json({ error: { message: 'note not found' } });
     }
     next();
 };
