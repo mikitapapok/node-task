@@ -5,6 +5,7 @@ const Joi = require('joi');
 const jsonParser = bodyParser.json();
 const router = express.Router();
 
+//createNoteValidation
 const fetchedData = Joi.object({
     id: Joi.string().required(),
     title: Joi.string().min(3).required(),
@@ -16,21 +17,17 @@ const fetchedData = Joi.object({
 let notes = [];
 let currentNote;
 const isDataValid = (req, res, next) => {
-    try {
-        const { error } = fetchedData.validate(req.body);
-        if (error) {
-            throw new Error('Data is invalid. Enter correct data');
-        }
-        next();
-    } catch (err) {
-        next(err.message);
+    const { error } = fetchedData.validate(req.body);
+    if (error) {
+        return res.status(404).json({ error: { message: error.message } });
     }
+    next();
 };
 const findElement = (req, res, next) => {
     try {
         currentNote = notes.find((note) => note.id === req.params.id);
         if (!currentNote) {
-            throw new Error('sended data not found');
+            throw new Error('sent data not found');
         }
         next();
     } catch (error) {
@@ -39,7 +36,8 @@ const findElement = (req, res, next) => {
 };
 
 const putElement = (req, res, next) => {
-    notes = [req.body];
+    // notes = [req.body];
+    notes = notes.map((note) => (note.id === req.params.id ? req.body : note));
     next();
 };
 
