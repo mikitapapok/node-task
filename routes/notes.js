@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const isDateValid = require('../validations/validationHandler');
+
 const jsonParser = bodyParser.json();
 const router = express.Router();
 
@@ -8,15 +9,11 @@ let notes = [];
 let currentNote;
 
 const findElement = (req, res, next) => {
-    try {
-        currentNote = notes.find((note) => note.id === req.params.id);
-        if (!currentNote) {
-            throw new Error('sent data not found');
-        }
-        next();
-    } catch (error) {
-        next(error.message);
+    currentNote = notes.find((note) => note.id === req.params.id);
+    if (!currentNote) {
+        res.status(404).json({ error: { message: error.message } });
     }
+    next();
 };
 
 const putElement = (req, res, next) => {
