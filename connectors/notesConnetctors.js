@@ -1,7 +1,7 @@
 let notes = [];
 let currentNote;
 
-const putNote= (req, res) => {
+const putNote = (req, res) => {
     currentNote = notes.find((note) => note.id === req.params.id);
     if (!currentNote) {
         return res.status(404).json({ error: { message: 'note not found' } });
@@ -16,7 +16,7 @@ const postNote = (req, res) => {
 };
 
 // eslint-disable-next-line consistent-return
-const deleteNote= (req, res) => {
+const deleteNote = (req, res) => {
     currentNote = notes.find((note) => note.id === req.params.id);
     if (!currentNote) {
         return res.status(404).json({ error: { message: 'note not found' } });
