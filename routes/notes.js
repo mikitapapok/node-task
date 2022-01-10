@@ -1,7 +1,7 @@
 const express = require('express');
 
 const isDateValid = require('../validations/validationHandler');
-const { postNote, putNote, deleteNote, getNotes } = require('../connectors/notesConnetctors');
+const { postNote, putNote, deleteNote, getNotes } = require('../controllers/notesControllers');
 
 const router = express.Router();
 
