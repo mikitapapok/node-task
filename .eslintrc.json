@@ -10,6 +10,9 @@
         "ecmaVersion": 13
     },
     "rules": {
-        "prettier/prettier": "error"
+        "prettier/prettier": "error",
+        "indent": "off",
+        "consistent-return": "off",
+        "object-curly-newline": "off"
     }
 }

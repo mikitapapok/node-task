@@ -1,12 +1,15 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+
 const app = express();
+const jsonParser = bodyParser.json();
 const PORT = process.env.PORT || 3000;
-app.set('view engine', 'pug');
+const routes = require('./routes/index');
+const customLogger = require('./middlewares/logger');
 
-app.get('/api/greetings/:name', (req, res) => {
-    res.render('index.pug', { name: req.params.name });
-});
-
+app.use(customLogger);
+app.use(jsonParser);
+app.use('/api', routes);
 app.listen(PORT, () => {
     console.log(PORT);
 });
