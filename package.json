@@ -33,6 +33,7 @@
         "express": "^4.17.2",
         "express-joi-validation": "^5.0.1",
         "joi": "^17.5.0",
+        "mongoose": "^6.1.5",
         "morgan": "^1.10.0",
         "pug": "^3.0.2"
     },
