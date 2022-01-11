@@ -1,33 +1,64 @@
-let notes = [];
-let currentNote;
+const Note = require('../validations/noteModel');
 
-const putNote = (req, res) => {
-    currentNote = notes.find((note) => note.id === req.params.id);
-    if (!currentNote) {
-        return res.status(404).json({ error: { message: 'note not found' } });
+const putNote = async (req, res) => {
+    try {
+        const currentId = req.params.id;
+        const currentNote = await Note.find({ _id: currentId });
+        if (!currentNote) {
+            throw new Error('note is note found');
+        }
+        if (!req.body) {
+            throw new Error('enter body to send');
+        }
+        await Note.findOneAndUpdate({ _id: currentId }, req.body);
+        res.json(req.body);
+    } catch (err) {
+        res.json(err.message);
     }
-    notes = notes.map((note) => (note.id === req.params.id ? req.body : note));
-    res.json(req.body);
 };
 
-const postNote = (req, res) => {
-    notes.push(req.body);
-    res.json(req.body);
+const postNote = async (req, res) => {
+    try {
+        const newNote = new Note(req.body);
+        if (!req.body) {
+            throw new Error(
+                'enter correct data. Object must contain: id,title,content, createdDate'
+            );
+        }
+        await newNote.save();
+        res.json(req.body);
+    } catch (err) {
+        res.status(400).json(err.message);
+    }
 };
 
 // eslint-disable-next-line consistent-return
-const deleteNote = (req, res) => {
-    currentNote = notes.find((note) => note.id === req.params.id);
-    if (!currentNote) {
-        return res.status(404).json({ error: { message: 'note not found' } });
+const deleteNote = async (req, res) => {
+    try {
+        const currentId = req.params.id;
+        const currentNote = await Note.findOne({ _id: currentId });
+        if (!currentNote) {
+            throw new Error('note is not found');
+        }
+        await Note.findByIdAndDelete(currentId);
+        res.json({ success: 'true', id: req.params.id });
+    } catch (err) {
+        res.status(404).json(err.message);
     }
-    const deleteElement = notes.findIndex((note) => note.id === req.params.id);
-    notes.splice(deleteElement, 1);
-    res.json({ success: 'true', id: req.params.id });
 };
 
-const getNotes = (req, res) => {
-    res.send(notes);
+const getNotes = async (req, res) => {
+    const title = new RegExp(req.query.title, 'i') || '';
+    const limit = req.query.limit || 10;
+    const start = req.query.start || '1900';
+    const end = req.query.end || '3000';
+
+    const notes = await Note.find({
+        title: { $regex: title },
+        createDate: { $gt: new Date(start).toDateString(), $lt: end },
+    });
+
+    res.send(notes.splice(0, limit));
 };
 
 module.exports = {
