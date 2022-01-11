@@ -4,7 +4,6 @@ const putNote = async (req, res) => {
     try {
         const currentId = req.params.id;
         const currentNote = await Note.findOne({ id: currentId });
-        console.log(currentNote);
         if (!currentNote) {
             throw new Error('note is not found');
         }
