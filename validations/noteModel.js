@@ -1,6 +1,10 @@
 const { Schema, model } = require('mongoose');
 
 const schem = new Schema({
+    id: {
+        type: String,
+        required: true,
+    },
     title: {
         type: String,
         min: [3, 'must be more than 3'],

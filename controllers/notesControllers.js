@@ -3,14 +3,15 @@ const Note = require('../validations/noteModel');
 const putNote = async (req, res) => {
     try {
         const currentId = req.params.id;
-        const currentNote = await Note.find({ _id: currentId });
+        const currentNote = await Note.findOne({ id: currentId });
+        console.log(currentNote);
         if (!currentNote) {
-            throw new Error('note is note found');
+            throw new Error('note is not found');
         }
         if (!req.body) {
             throw new Error('enter body to send');
         }
-        await Note.findOneAndUpdate({ _id: currentId }, req.body);
+        await Note.findOneAndUpdate({ id: currentId }, req.body);
         res.json(req.body);
     } catch (err) {
         res.json(err.message);
@@ -36,11 +37,11 @@ const postNote = async (req, res) => {
 const deleteNote = async (req, res) => {
     try {
         const currentId = req.params.id;
-        const currentNote = await Note.findOne({ _id: currentId });
+        const currentNote = await Note.findOne({ id: currentId });
         if (!currentNote) {
             throw new Error('note is not found');
         }
-        await Note.findByIdAndDelete(currentId);
+        await Note.findOneAndRemove({ id: currentId });
         res.json({ success: 'true', id: req.params.id });
     } catch (err) {
         res.status(404).json(err.message);
