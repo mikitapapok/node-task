@@ -1,7 +1,5 @@
 const Note = require('../models/noteModel');
 
-const initStartDate = new Date('1900').toDateString();
-const initEndDate = new Date('3000').toDateString();
 const putNote = async (req, res) => {
     try {
         const currentId = req.params.id;
