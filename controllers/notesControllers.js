@@ -46,7 +46,7 @@ const validateDatesFromParams = (startDateString, endDateString) => {
 };
 
 const getNotes = async (req, res) => {
-    const { limit = 2, page = 1, title = '', start, end } = req.query;
+    const { limit = 10, page = 1, title = '', start, end } = req.query;
     let filter = {
         title: { $regex: title },
     };
