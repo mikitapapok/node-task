@@ -17,13 +17,9 @@ const putNote = async (req, res) => {
 };
 
 const postNote = async (req, res) => {
-    try {
-        const newNote = new Note(req.body);
-        await newNote.save();
-        res.json(req.body);
-    } catch (err) {
-        res.status(400).json(err.message);
-    }
+    const newNote = new Note(req.body);
+    await newNote.save();
+    res.json(req.body);
 };
 
 // eslint-disable-next-line consistent-return
