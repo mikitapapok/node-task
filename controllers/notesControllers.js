@@ -52,7 +52,6 @@ const getNotes = async (req, res) => {
     const notes = await Note.find(filter)
         .skip((page - 1) * limit)
         .limit(limit);
-    console.log(process.env.NODE_ENV);
     res.send(notes);
 };
 
