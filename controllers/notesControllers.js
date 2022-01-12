@@ -1,5 +1,7 @@
-const Note = require('../validations/noteModel');
+const Note = require('../models/noteModel');
 
+const initStartDate = '1900';
+const initEndDate = '3000';
 const putNote = async (req, res) => {
     try {
         const currentId = req.params.id;
@@ -7,24 +9,16 @@ const putNote = async (req, res) => {
         if (!currentNote) {
             throw new Error('note is not found');
         }
-        if (!req.body) {
-            throw new Error('enter body to send');
-        }
-        await Note.findOneAndUpdate({ id: currentId }, req.body);
-        res.json(req.body);
-    } catch (err) {
-        res.json(err.message);
+        const note = await Note.findOneAndUpdate({ id: currentId }, req.body);
+        res.json(note);
+    } catch (error) {
+        res.status(404).json({ error: { message: error.message } });
     }
 };
 
 const postNote = async (req, res) => {
     try {
         const newNote = new Note(req.body);
-        if (!req.body) {
-            throw new Error(
-                'enter correct data. Object must contain: id,title,content, createdDate'
-            );
-        }
         await newNote.save();
         res.json(req.body);
     } catch (err) {
@@ -42,23 +36,27 @@ const deleteNote = async (req, res) => {
         }
         await Note.findOneAndRemove({ id: currentId });
         res.json({ success: 'true', id: req.params.id });
-    } catch (err) {
-        res.status(404).json(err.message);
+    } catch (error) {
+        res.status(404).json({ error: { message: error.message } });
     }
 };
 
 const getNotes = async (req, res) => {
-    const title = new RegExp(req.query.title, 'i') || '';
-    const limit = req.query.limit || 10;
-    const start = req.query.start || '1900';
-    const end = req.query.end || '3000';
-
+    const {
+        limit = 10,
+        page = 1,
+        title = '',
+        start = initStartDate,
+        end = initEndDate,
+    } = req.query;
     const notes = await Note.find({
         title: { $regex: title },
         createDate: { $gt: new Date(start).toDateString(), $lt: end },
-    });
+    })
+        .limit(limit)
+        .skip((page - 1) * limit);
 
-    res.send(notes.splice(0, limit));
+    res.send(notes);
 };
 
 module.exports = {
