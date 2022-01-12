@@ -1,4 +1,5 @@
 const Note = require('../models/noteModel');
+const validateDatesFromParams = require('../validations/getDataFromDateString');
 
 const putNote = async (req, res) => {
     try {
@@ -33,16 +34,6 @@ const deleteNote = async (req, res) => {
     } catch (error) {
         res.status(404).json({ error: { message: error.message } });
     }
-};
-const getDataFromDateString = (dateString) => (dateString ? new Date(dateString) : null);
-
-const validateDatesFromParams = (startDateString, endDateString) => {
-    const startDate = getDataFromDateString(startDateString);
-    const endDate = getDataFromDateString(endDateString);
-    if (startDate && endDate && startDate > endDate) {
-        throw new Error('start date cannot be bigger then end date');
-    }
-    return [startDate, endDate];
 };
 
 const getNotes = async (req, res) => {
