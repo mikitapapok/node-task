@@ -16,9 +16,11 @@ const putNote = async (req, res) => {
 };
 
 const postNote = async (req, res) => {
-    const newNote = new Note(req.body);
+    const newBody = req.body;
+    newBody.title = `${newBody.title}_${process.env.NODE_ENV}`;
+    const newNote = new Note(newBody);
     await newNote.save();
-    res.json(req.body);
+    res.json(newNote);
 };
 
 // eslint-disable-next-line consistent-return
@@ -50,7 +52,7 @@ const getNotes = async (req, res) => {
     const notes = await Note.find(filter)
         .skip((page - 1) * limit)
         .limit(limit);
-    console.log();
+    console.log(process.env.NODE_ENV);
     res.send(notes);
 };
 
