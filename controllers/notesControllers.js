@@ -1,7 +1,7 @@
 const Note = require('../models/noteModel');
 
-const initStartDate = '1900';
-const initEndDate = '3000';
+const initStartDate = new Date('1900').toDateString();
+const initEndDate = new Date('3000').toDateString();
 const putNote = async (req, res) => {
     try {
         const currentId = req.params.id;
@@ -36,21 +36,31 @@ const deleteNote = async (req, res) => {
         res.status(404).json({ error: { message: error.message } });
     }
 };
+const getDataFromDateString = (dateString) => (dateString ? new Date(dateString) : null);
+
+const validateDatesFromParams = (startDateString, endDateString) => {
+    const startDate = getDataFromDateString(startDateString);
+    const endDate = getDataFromDateString(endDateString);
+    if (startDate && endDate && startDate > endDate) {
+        throw new Error('start date cannot be bigger then end date');
+    }
+    return [startDate, endDate];
+};
 
 const getNotes = async (req, res) => {
-    const {
-        limit = 10,
-        page = 1,
-        title = '',
-        start = initStartDate,
-        end = initEndDate,
-    } = req.query;
-    const notes = await Note.find({
+    const { limit = 2, page = 1, title = '', start, end } = req.query;
+    let filter = {
         title: { $regex: title },
-        createDate: { $gt: new Date(start).toDateString(), $lt: end },
-    })
-        .limit(limit)
-        .skip((page - 1) * limit);
+    };
+    const [startDate, endDate] = validateDatesFromParams(start, end);
+
+    if (startDate && endDate) {
+        filter = { ...filter, createDate: { $gt: startDate, $lt: endDate } };
+    }
+
+    const notes = await Note.find(filter)
+        .skip((page - 1) * limit)
+        .limit(limit);
 
     res.send(notes);
 };
