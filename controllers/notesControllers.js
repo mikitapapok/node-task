@@ -1,32 +1,57 @@
-let notes = [];
-let currentNote;
+const Note = require('../models/noteModel');
+const validateDatesFromParams = require('../validations/getDataFromDateString');
 
-const putNote = (req, res) => {
-    currentNote = notes.find((note) => note.id === req.params.id);
-    if (!currentNote) {
-        return res.status(404).json({ error: { message: 'note not found' } });
+const putNote = async (req, res) => {
+    try {
+        const currentId = req.params.id;
+        const currentNote = await Note.findOne({ id: currentId });
+        if (!currentNote) {
+            throw new Error('note is not found');
+        }
+        const note = await Note.findOneAndUpdate({ id: currentId }, req.body);
+        res.json(note);
+    } catch (error) {
+        res.status(404).json({ error: { message: error.message } });
     }
-    notes = notes.map((note) => (note.id === req.params.id ? req.body : note));
-    res.json(req.body);
 };
 
-const postNote = (req, res) => {
-    notes.push(req.body);
-    res.json(req.body);
+const postNote = async (req, res) => {
+    const newBody = req.body;
+    newBody.title = `${newBody.title}_${process.env.NODE_ENV}`;
+    const newNote = new Note(newBody);
+    await newNote.save();
+    res.json(newNote);
 };
 
 // eslint-disable-next-line consistent-return
-const deleteNote = (req, res) => {
-    currentNote = notes.find((note) => note.id === req.params.id);
-    if (!currentNote) {
-        return res.status(404).json({ error: { message: 'note not found' } });
+const deleteNote = async (req, res) => {
+    try {
+        const currentId = req.params.id;
+        const currentNote = await Note.findOne({ id: currentId });
+        if (!currentNote) {
+            throw new Error('note is not found');
+        }
+        await Note.findOneAndRemove({ id: currentId });
+        res.json({ success: 'true', id: req.params.id });
+    } catch (error) {
+        res.status(404).json({ error: { message: error.message } });
     }
-    const deleteElement = notes.findIndex((note) => note.id === req.params.id);
-    notes.splice(deleteElement, 1);
-    res.json({ success: 'true', id: req.params.id });
 };
 
-const getNotes = (req, res) => {
+const getNotes = async (req, res) => {
+    const { limit = 10, page = 1, title = '', start, end } = req.query;
+    let filter = {
+        title: { $regex: title },
+    };
+    const [startDate, endDate] = validateDatesFromParams(start, end);
+
+    if (startDate && endDate) {
+        filter = { ...filter, createDate: { $gt: startDate, $lt: endDate } };
+    }
+
+    const notes = await Note.find(filter)
+        .skip((page - 1) * limit)
+        .limit(limit);
     res.send(notes);
 };
 
